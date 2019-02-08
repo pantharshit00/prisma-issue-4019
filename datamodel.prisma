@@ -1,0 +1,126 @@
+type BillingAccount @pgTable(name: "BillingAccount") {
+  createdAt: DateTime!
+  customer: Customer @pgRelation(column: "customerId")
+  id: Int! @id @unique
+  Invoices: [Invoice!]!
+  Item_BillingAccounts: [Item_BillingAccount!]!
+  name: String!
+  updatedAt: DateTime!
+}
+
+type Condition @pgTable(name: "Condition") {
+  createdAt: DateTime!
+  endDate: DateTime!
+  id: Int! @id @unique
+  product: Product @pgRelation(column: "productId")
+  startDate: DateTime!
+  updatedAt: DateTime!
+}
+
+type Contract @pgTable(name: "Contract") {
+  activationDateTime: DateTime
+  code: String! @unique
+  Costs: [Cost!]!
+  createdAt: DateTime!
+  customer: Customer @pgRelation(column: "customerId")
+  enabled: Boolean @default(value: false)
+  GlobalConditions: [GlobalCondition!]!
+  id: Int! @id @unique
+  Items: [Item!]!
+  lookToBook: Float!
+  minimumFee: Float!
+  updatedAt: DateTime!
+}
+
+type Cost @pgTable(name: "Cost") {
+  amount: Float
+  contract: Contract @pgRelation(column: "contractId")
+  createdAt: DateTime!
+  id: Int! @id @unique
+  item: Item @pgRelation(column: "itemId")
+  max: Int
+  min: Int
+  type: String!
+  updatedAt: DateTime!
+}
+
+type Customer @pgTable(name: "Customer") {
+  BillingAccounts: [BillingAccount!]!
+  code: String! @unique
+  Contracts: [Contract!]!
+  createdAt: DateTime!
+  id: Int! @id @unique
+  name: String!
+  updatedAt: DateTime!
+}
+
+type GlobalCondition @pgTable(name: "GlobalCondition") {
+  amount: Float
+  contract: Contract @pgRelation(column: "contractId")
+  createdAt: DateTime!
+  defaultFreeTrialDaysForItem: Int
+  globalEndFreeTrialPeriod: DateTime
+  globalStartFreeTrialPeriod: DateTime
+  id: Int! @id @unique
+  millionSearches: Int
+  numConnections: Int
+  type: String!
+  updatedAt: DateTime!
+}
+
+type Invoice @pgTable(name: "Invoice") {
+  amount: Float!
+  amountPaid: Float!
+  billingAccount: BillingAccount @pgRelation(column: "billingAccountId")
+  createdAt: DateTime!
+  endDate: DateTime!
+  id: Int! @id @unique
+  InvoiceBreakdowns: [InvoiceBreakdown!]!
+  paymentMethod: String!
+  paymentStatus: String!
+  startDate: DateTime!
+  updatedAt: DateTime!
+}
+
+type InvoiceBreakdown @pgTable(name: "InvoiceBreakdown") {
+  amount: Float!
+  createdAt: DateTime!
+  endDate: DateTime!
+  id: Int! @id @unique
+  invoice: Invoice @pgRelation(column: "invoiceId")
+  itemBillingAccount: Item_BillingAccount
+    @pgRelation(column: "itemBillingAccountId")
+  startDate: DateTime!
+  updatedAt: DateTime!
+}
+
+type Item @pgTable(name: "Item") {
+  contract: Contract @pgRelation(column: "contractId")
+  Costs: [Cost!]!
+  createdAt: DateTime!
+  enabled: Boolean @default(value: false)
+  id: Int! @id @unique
+  Item_BillingAccounts: [Item_BillingAccount!]!
+  Products: [Product!]!
+  specificFreeTrialDays: Int
+  updatedAt: DateTime!
+}
+
+type Item_BillingAccount @pgTable(name: "Item_BillingAccount") {
+  billingAccount: BillingAccount @pgRelation(column: "billingAccountId")
+  createdAt: DateTime!
+  id: Int! @id @unique
+  InvoiceBreakdowns: [InvoiceBreakdown!]!
+  item: Item @pgRelation(column: "itemId")
+  updatedAt: DateTime!
+}
+
+type Product @pgTable(name: "Product") {
+  Conditions: [Condition!]!
+  createdAt: DateTime!
+  id: Int! @id @unique
+  item: Item @pgRelation(column: "itemId")
+  system: String!
+  type: String!
+  updatedAt: DateTime!
+}
